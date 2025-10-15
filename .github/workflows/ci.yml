@@ -1,7 +1,7 @@
 name: End-to-end tests
 on: push
 jobs:
-  cypress-run: npm run test:cloud
+  cypress-run:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
