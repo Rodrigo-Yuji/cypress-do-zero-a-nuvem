@@ -7,7 +7,9 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.title().should('eq', 'Central de Atendimento ao Cliente TAT')
   })
 
+  
   it('preenche os campos obrigatórios e envia o formulário', () =>{
+    cy.clock()
     const longText = Cypress._.repeat('Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 10)
 
     cy.get('#firstName').type('Rodrigo')
@@ -17,9 +19,13 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.get('.button[type="submit"]').click()
 
     cy.get('.success').should('be.visible')
+    cy.tick(3000)
+    cy.get('.success').should('not.be.visible')
   })
 
   it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', () => {
+    cy.clock()
+
     cy.get('#firstName').type('Rodrigo')
     cy.get('#lastName').type('Tamoto')
     cy.get('#email').type('meuemail@hotmaiww')
@@ -27,6 +33,8 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.get('.button[type="submit"]').click()
 
     cy.get('.error').should('be.visible')
+    cy.tick(3000)
+    cy.get('.error').should('not.be.visible')
   })
 
   it('valida se telefone aceita só número', () => {
@@ -36,6 +44,8 @@ describe('Central de Atendimento ao Cliente TAT', () => {
   })
 
   it('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário', () => {
+    cy.clock()
+
     cy.get('#firstName').type('Rodrigo')
     cy.get('#lastName').type('Tamoto')
     cy.get('#email').type('meuemail@hotmail.com')
@@ -44,6 +54,8 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.get('.button[type="submit"]').click()
 
     cy.get('.error').should('be.visible')
+    cy.tick(3000)
+    cy.get('.error').should('not.be.visible')
   })
 
   it('preenche e limpa os campos nome, sobrenome, email e telefone', () => {
@@ -69,12 +81,18 @@ describe('Central de Atendimento ao Cliente TAT', () => {
       .should('have.value', '')
   })
 
-  it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', () => {
-    cy.get('button[type="submit"]').click()
+  Cypress._.times(3, () => {
+    it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', () => {
+      cy.clock()
 
-    cy.get('.error').should('be.visible')
+      cy.get('button[type="submit"]').click()
+
+      cy.get('.error').should('be.visible')
+      cy.tick(3000)
+      cy.get('.error').should('not.be.visible')
+    })
   })
-
+  
     it('marca o tipo de atendimento "Feedback"', () => {
     cy.get('input[type="radio"][value="feedback"]')
       .check()
@@ -157,4 +175,28 @@ describe('Central de Atendimento ao Cliente TAT', () => {
 
     cy.contains('h1', 'CAC TAT - Política de Privacidade').should('be.visible')
   })
+
+  it('exibe e oculta as mensagens de sucesso e erro usando .invoke()', () => {
+    cy.get('.success')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+      .and('contain', 'Mensagem enviada com sucesso.')
+      .invoke('hide')
+      .should('not.be.visible')
+    cy.get('.error')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+      .and('contain', 'Valide os campos obrigatórios!')
+      .invoke('hide')
+      .should('not.be.visible')
+  })
+
+  it('preenche o campo da área de texto usando o comando invoke', () =>{
+    cy.get('#open-text-area')
+      .invoke('val', 'um texto qualquer')
+      .should('have.value', 'um texto qualquer')
+  })
+
 })
