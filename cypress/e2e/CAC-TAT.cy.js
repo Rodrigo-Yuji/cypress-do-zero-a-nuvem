@@ -58,27 +58,29 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.get('.error').should('not.be.visible')
   })
 
-  it('preenche e limpa os campos nome, sobrenome, email e telefone', () => {
-    cy.get('#firstName')
-      .type('Rodrigo')
-      .should('have.value', 'Rodrigo')
-      .clear()
-      .should('have.value', '')
-    cy.get('#lastName')
-      .type('Tamoto')
-      .should('have.value', 'Tamoto')
-      .clear()
-      .should('have.value', '')
-    cy.get('#email')
-      .type('meuemail@hotmail.com')
-      .should('have.value', 'meuemail@hotmail.com')
-      .clear()
-      .should('have.value', '')
-    cy.get('#phone')
-      .type('62984158360')
-      .should('have.value', '62984158360')
-      .clear()
-      .should('have.value', '')
+  Cypress._.times(2, () => {
+    it('preenche e limpa os campos nome, sobrenome, email e telefone', () => {
+      cy.get('#firstName')
+        .type('Rodrigo')
+        .should('have.value', 'Rodrigo')
+        .clear()
+        .should('have.value', '')
+      cy.get('#lastName')
+        .type('Tamoto')
+        .should('have.value', 'Tamoto')
+        .clear()
+        .should('have.value', '')
+      cy.get('#email')
+        .type('meuemail@hotmail.com')
+        .should('have.value', 'meuemail@hotmail.com')
+        .clear()
+        .should('have.value', '')
+      cy.get('#phone')
+        .type('62984158360')
+        .should('have.value', '62984158360')
+        .clear()
+        .should('have.value', '')
+    })
   })
 
   Cypress._.times(3, () => {
@@ -93,7 +95,7 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     })
   })
   
-    it('marca o tipo de atendimento "Feedback"', () => {
+  it('marca o tipo de atendimento "Feedback"', () => {
     cy.get('input[type="radio"][value="feedback"]')
       .check()
       .should('be.checked')
@@ -197,6 +199,40 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.get('#open-text-area')
       .invoke('val', 'um texto qualquer')
       .should('have.value', 'um texto qualquer')
+  })
+
+  it('faz uma requisição HTTP', () => {
+    cy.request({
+      method: 'GET',
+      url: 'https://cac-tat-v3.s3.eu-central-1.amazonaws.com/index.html',
+    }).should(response => {
+        expect(response.status).to.equal(200)
+        expect(response.statusText).to.equal('OK')
+        expect(response.body).to.include('CAC TAT')
+      })
+  })
+
+  it('faz uma requisição HTTP com alias', () => {
+    cy.request({
+      method: 'GET',
+      url: 'https://cac-tat-v3.s3.eu-central-1.amazonaws.com/index.html',
+    }).as('getRequest')
+      .its('status')
+      .should('be.equal', 200)
+
+    cy.get('@getRequest')
+      .its('statusText')
+      .should('be.equal', 'OK')
+      
+    cy.get('@getRequest')
+      .its('body')
+      .should('contain', 'CAC TAT')
+  })
+
+  it('fazer o gato aparecer', () => {
+    cy.get('#cat')
+      .invoke('show')
+      .should('be.visible')
   })
 
 })
